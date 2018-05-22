@@ -26,8 +26,8 @@ module.exports.userLoginWithAD = (req, res, next) => {
             console.log(err);
             return res.status(401).json({
                 success: false,
-                message: 'Authentication Failed',
-                error: err
+                message: 'Authentication Failed'
+                //error: err
             });
         }
         if (auth) {
@@ -37,7 +37,7 @@ module.exports.userLoginWithAD = (req, res, next) => {
                 },
                 process.env.JWT_KEY,
                 {
-                    expiresIn: '2h'
+                    expiresIn: '5h'
                 }
             );
             return res.status(200).json({

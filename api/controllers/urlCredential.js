@@ -40,7 +40,7 @@ module.exports.getUrlcredentials = (req, res, next) => {
 module.exports.getUpdatedUrlcredentials = (req, res, next) => {
     Project.findById(req.params.id).select('urlCredentials').exec()
         .then(result => {
-            if (result.urlCredentials.length > 0) {
+            if (result && result.urlCredentials.length > 0) {
                 UrlCredential.remove({ _id: { $in: result.urlCredentials } })
                     .then(r => console.log("All old url removed"))
                     .catch(err => {

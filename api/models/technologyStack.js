@@ -6,4 +6,5 @@ const techStackSchema = mongoose.Schema({
         required: true
     }
 });
+techStackSchema.index({'technologyName': 'text'});
 module.exports = mongoose.model('TechnologyStack', techStackSchema);

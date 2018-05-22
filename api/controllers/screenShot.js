@@ -41,15 +41,12 @@ module.exports.updateScreenShots = (req, res, next) => {
             req.body.deletedScreenShots = JSON.parse(req.body.deletedScreenShots);
         }
         if (req.body.deletedScreenShots.length > 0) {
-            let arryId = req.body.deletedScreenShots.map((curr, i, arr) => {
-                return mongoose.Types.ObjectId(curr);
-            });
-            console.log("ARR:", arryId);
+            // let arryId = req.body.deletedScreenShots.map((curr, i, arr) => {
+            //     return mongoose.Types.ObjectId(curr);
+            // });
             ScreenShot.find({ _id: { $in: req.body.deletedScreenShots } }).exec()
                 .then(r1 => {
-                    console.log("RRERR:", r1);
                     r1.map((curr, i, arr) => {
-                         console.log(2);
                         fs.unlink(curr.file.path, (err) => {
                             if (err) {
                                 console.log(err);
@@ -58,7 +55,6 @@ module.exports.updateScreenShots = (req, res, next) => {
                             console.log(curr.file.path, "All SS from folder have removed");
                         })
                     });
-                    console.log(3);
                     ScreenShot.remove({ _id: { $in: req.body.deletedScreenShots } })
                         .then(r => {
                             console.log("All SS from database have removed");
@@ -72,8 +68,6 @@ module.exports.updateScreenShots = (req, res, next) => {
                     console.log(err);
                     return res.status(500).json({ error: err });
                 });
-
-
         }
     }
 

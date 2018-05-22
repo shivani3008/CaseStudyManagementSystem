@@ -66,6 +66,8 @@ const projectSchema = mongoose.Schema({
         default: new Date()
     }
 });
-
-projectSchema.index({'projectName': 'text', 'tags': 'text', 'type': 'text', 'clientName': 'text'});
+// projectSchema.path('projectName').validate((value) => {
+//     return value != null;
+// });
+projectSchema.index({'projectName': 'text', 'tags': 'text', 'type': 'text', 'clientName': 'text', 'technologyStack': 'text'});
 module.exports = mongoose.model('Project', projectSchema);

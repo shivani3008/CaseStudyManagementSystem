@@ -18,6 +18,16 @@ const storage = multer.diskStorage({
     }
 });
 
+// project = new Project({
+//         projectName: req.body.projectName
+//     });
+//     console.log(1);
+//     project.validate((err) => {
+//         console.log(2);
+//         cb(null, false);
+//         console.log("NENENE: ", err, __filename); // Will tell you that null is not allowed.
+//     });
+
 const fileFilter = (req, file, cb) => {
     //if (req.body.projectN)
     if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
@@ -39,6 +49,7 @@ const upload = multer({
 
 router.get('/', checkAuth, projectsController.getAllProjects);
 router.post('/', checkAuth, upload.any(), urlCredentialController.getUrlcredentials, screenShotController.insertScreenShots, projectsController.createProject);
+router.post('/a', checkAuth, projectsController.createProject_);
 router.get('/:id', checkAuth, projectsController.getProject);
 router.patch('/:id', checkAuth, upload.any(), urlCredentialController.getUpdatedUrlcredentials, screenShotController.updateScreenShots, projectsController.editProject);
 router.post('/search', checkAuth, projectsController.searchProject);

@@ -4,8 +4,8 @@
         "PORT": "3000",
         "DOMAIN_NAME": "http://172.16.4.55:3000/",
         "JWT_KEY": "EveRyTh!ng|s$eCrEt",
-        "EMAIL": "dev.sgb@gmail.com",
-        "EMAIL_PSWD": "devsgb2511",
+        "EMAIL": "***",
+        "EMAIL_PSWD": "***",
         "EMAIL_SERVICE_PROVIDER": "gmail"
     }
 }
