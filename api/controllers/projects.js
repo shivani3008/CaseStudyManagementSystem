@@ -5,6 +5,7 @@ const Project = require('../models/project');
 const UrlCredential = require('../models/urlCredential');
 const TechnologyStack = require('../models/technologyStack');
 const screenShot = require('../models/screenShot');
+const path = require('path');
 
 let getProject = (curr) => {
     let obj = {
@@ -16,7 +17,7 @@ let getProject = (curr) => {
             return {
                 _id: current._id,
                 originalName: current.file.originalname,
-                path: process.env.DOMAIN_NAME + current.file.path
+                path: process.env.DOMAIN_NAME + path.dirname(current.file.path) + '/' + path.basename(current.file.path)
             }
         }),
         startDate: new Date(curr.startDate).toString(),
