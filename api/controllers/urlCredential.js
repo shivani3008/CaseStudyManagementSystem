@@ -53,7 +53,7 @@ module.exports.getUpdatedUrlcredentials = (req, res, next) => {
             console.log(err);
             return res.status(500).json({ error: err });
         })
-
+console.log("Hurrey");
     if (req.body.urlCredentials) {
         if (!Array.isArray(req.body.urlCredentials)) {
             req.body.urlCredentials = JSON.parse(req.body.urlCredentials);
@@ -72,6 +72,7 @@ module.exports.getUpdatedUrlcredentials = (req, res, next) => {
                     arr1.push(ans._id);
                     req.urlCredentials = arr1;
                     if (arr1.length === req.body.urlCredentials.length) {
+                        console.log("Hurrey 2");
                         next();
                     }
                 })

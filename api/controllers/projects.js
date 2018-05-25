@@ -226,6 +226,7 @@ module.exports.getProject = (req, res, next) => {
 };
 
 module.exports.editProject = (req, res, next) => {
+    console.log(req.body);
     if (req.body.technologyStack && !Array.isArray(req.body.technologyStack)) {
         req.body.technologyStack = JSON.parse(req.body.technologyStack);
     }

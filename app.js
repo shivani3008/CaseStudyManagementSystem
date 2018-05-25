@@ -13,7 +13,9 @@ mongoose.Promise = global.Promise;
 
 mongoose.connect(
     'mongodb://172.16.7.101/CaseStudyMDB'
-);
+)
+    .then(() => console.log('Database connected!'))
+    .catch((err) => console.error(err));;
 
 // The :status token will be colored-
 // red: server error codes
@@ -23,7 +25,7 @@ mongoose.connect(
 app.use(morgan('dev'));
 
 app.use('/uploads', express.static('uploads'));
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
@@ -32,7 +34,7 @@ app.use((req, res, next) => {
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept, Authorization"
     );
-    if(req.method === 'OPTIONS') {
+    if (req.method === 'OPTIONS') {
         res.header(
             "Access-Control-Allow-Methods",
             'GET, POST, PUT, PATCH, DELETE'
