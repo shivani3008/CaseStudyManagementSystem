@@ -64,7 +64,10 @@ const projectSchema = mongoose.Schema({
         type: Date,
         required: true,
         default: new Date()
-    }
+    },
+    countryName : String,
+    latitude : String,
+    longitude : String
 });
 // projectSchema.path('projectName').validate((value) => {
 //     return value != null;

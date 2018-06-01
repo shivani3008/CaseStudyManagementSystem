@@ -17,7 +17,7 @@ let getProject = (curr) => {
             return {
                 _id: current._id,
                 originalName: current.file.originalname,
-                path: process.env.DOMAIN_NAME + path.dirname(current.file.path) + '/' + path.basename(current.file.path)
+                path: process.env.DOMAIN_NAME + ":" + process.env.PORT + "/" + path.dirname(current.file.path) + '/' + path.basename(current.file.path)
             }
         }),
         startDate: new Date(curr.startDate).toString(),
@@ -32,7 +32,12 @@ let getProject = (curr) => {
         tags: curr.tags,
         userName: curr.userName,
         urlCredentials: curr.urlCredentials,
-        createdDateTime: new Date(curr.createdDateTime).toString()
+        createdDateTime: new Date(curr.createdDateTime).toString(),
+        countryDetails: {
+            countryName: curr.countryName,
+            latitude: curr.latitude,
+            longitude: curr.longitude
+        }
     };
     return obj;
 };
@@ -175,7 +180,7 @@ module.exports.createProject_ = (req, res, next) => {
 };
 
 module.exports.getAllProjects = (req, res, next) => {
-    Project.find({ userName: req.checkAuthUserData.userName }).populate(populateArr).exec()
+    Project.find().populate(populateArr).exec()
         //populate('urlCredentials', 'url userName password type').exec()
         .then(project => {
             // console.log(user);
@@ -225,121 +230,94 @@ module.exports.getProject = (req, res, next) => {
         });
 };
 
-module.exports.editProject = (req, res, next) => {
-    console.log(req.body);
-    if (req.body.technologyStack && !Array.isArray(req.body.technologyStack)) {
-        req.body.technologyStack = JSON.parse(req.body.technologyStack);
-    }
-    if (req.body.teamMembers && !Array.isArray(req.body.teamMembers)) {
-        req.body.teamMembers = JSON.parse(req.body.teamMembers);
-    }
-    if (req.body.tags && !Array.isArray(req.body.tags)) {
-        req.body.tags = JSON.parse(req.body.tags);
-    }
-    if (req.body.deletedScreenShots) {
-        if (!Array.isArray(req.body.deletedScreenShots)) {
-            req.body.deletedScreenShots = JSON.parse(req.body.deletedScreenShots);
+module.exports.editProject = async (req, res, next) => {
+    try {
+        console.log('BODY', req.body, '\n',req.urlCredentials);
+        if (req.body.technologyStack && !Array.isArray(req.body.technologyStack)) {
+            req.body.technologyStack = JSON.parse(req.body.technologyStack);
         }
-        if (req.body.deletedScreenShots.length > 0) {
-            Project.update(
-                {},
-                { $pull: { screenShots: { $in: req.body.deletedScreenShots } } },
-                { multi: true }
-            ).exec()
-                .then(q => {
-                    console.log("Some deleted from Project");
-                })
-                .catch(err => {
-                    console.log(err);
-                    return res.status(500).json({ error: err });
-                });
+        if (req.body.teamMembers && !Array.isArray(req.body.teamMembers)) {
+            req.body.teamMembers = JSON.parse(req.body.teamMembers);
         }
-    }
+        if (req.body.tags && !Array.isArray(req.body.tags)) {
+            req.body.tags = JSON.parse(req.body.tags);
+        }
+        if (req.body.deletedScreenShots) {
+            if (!Array.isArray(req.body.deletedScreenShots)) {
+                req.body.deletedScreenShots = JSON.parse(req.body.deletedScreenShots);
+            }
+            if (req.body.deletedScreenShots.length > 0) {
+                await Project.update(
+                    {},
+                    { $pull: { screenShots: { $in: req.body.deletedScreenShots } } },
+                    { multi: true }
+                )
+                console.log("Some deleted from Project");
+            }
+        }
 
-    if (req.newScreenShots && req.newScreenShots.length > 0) {
-        let newScreenShots = req.newScreenShots.map((curr, index, arr) => {
-            return curr._id;
-        });
-        Project.update(
-            { _id: req.params.id },
-            { $push: { screenShots: { $each: newScreenShots } } }
-        ).exec()
-            .then(q => {
-                console.log("New SS inserted to Project");
-            })
-            .catch(err => {
-                return res.status(500).json({ error: err });
+        if (req.newScreenShots && req.newScreenShots.length > 0) {
+            let newScreenShots = req.newScreenShots.map((curr, index, arr) => {
+                return curr._id;
             });
-    }
-    Project.findById(req.params.id)
-        .then(result1 => {
-            if (result1) {
-                result1.projectName = req.body.projectName;
-                result1.clientName = req.body.clientName;
-                result1.technologyStack = req.body.technologyStack;
-                // result1.screenShots = req.newScreenShots.map((curr, index, arr) => {
-                //         result1.screenShots.push(curr._id);
-                //     });
-                result1.startDate = req.body.startDate;
-                result1.endDate = req.body.endDate;
-                result1.budgetedHours = req.body.budgetedHours;
-                result1.consumedHours = req.body.consumedHours;
-                result1.teamLead = req.body.teamLead;
-                result1.teamMembers = req.body.teamMembers;
-                result1.projectManager = req.body.projectManager;
-                result1.type = req.body.type;
-                result1.description = req.body.description;
-                result1.tags = req.body.tags;
-                result1.urlCredentials = req.urlCredentials;
-                return result1.save();
-            }
-            else {
-                res.status(200).json({
-                    success: false,
-                    message: "No entry found for provided Project ID",
+            await Project.update(
+                { _id: req.params.id },
+                { $push: { screenShots: { $each: newScreenShots } } }
+            );
+            console.log("New SS inserted to Project");
+        }
+
+        let result1 = await Project.findById(req.params.id);
+        if (result1) {
+            result1.projectName = req.body.projectName;
+            result1.clientName = req.body.clientName;
+            result1.technologyStack = req.body.technologyStack;
+            // result1.screenShots = req.newScreenShots.map((curr, index, arr) => {
+            //         result1.screenShots.push(curr._id);
+            //     });
+            result1.startDate = req.body.startDate;
+            result1.endDate = req.body.endDate;
+            result1.budgetedHours = req.body.budgetedHours;
+            result1.consumedHours = req.body.consumedHours;
+            result1.teamLead = req.body.teamLead;
+            result1.teamMembers = req.body.teamMembers;
+            result1.projectManager = req.body.projectManager;
+            result1.type = req.body.type;
+            result1.description = req.body.description;
+            result1.tags = req.body.tags;
+            result1.urlCredentials = req.urlCredentials;
+            let ans = await result1.save();
+            if (ans) {
+                let curr = await Project.findById(req.params.id).populate(populateArr);
+                res.status(201).json({
+                    success: true,
+                    message: "Project Updated Successfully",
+                    project: getProject(curr)
                 });
             }
-        })
-        .then(result1 => {
-            if (result1) {
-                Project.findById(req.params.id).populate(populateArr).exec()
-                    .then(curr => {
-                        res.status(201).json({
-                            success: true,
-                            message: "Project Updated Successfully",
-                            project: getProject(curr)
-                        });
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        return res.status(500).json({
-                            error: err
-                        });
-                    });
-            }
-            else {
-                res.status(200).json({
-                    success: false,
-                    message: "No entry found for provided Project ID",
-                });
-            }
-        })
-        .catch(err => {
+        }
+        else {
+            res.status(200).json({
+                success: false,
+                message: "No entry found for provided Project ID",
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        if (err.name === 'ValidationError') {
+            res.status(422).json({
+                success: false,
+                error: {
+                    type: err.name,
+                    message: err.message
+                }
+            });
+        }
+        else {
             console.log(err);
-            if (err.name === 'ValidationError') {
-                return res.status(422).json({
-                    success: false,
-                    error: {
-                        type: err.name,
-                        message: err.message
-                    }
-                });
-            }
-            else {
-                console.log(err);
-                return res.status(500).json({ error: err });
-            }
-        });
+            res.status(500).json({ error: err });
+        }
+    };
 };
 
 module.exports.searchProject = (req, res, next) => {
@@ -359,28 +337,28 @@ module.exports.searchProject = (req, res, next) => {
                 },
                 {
                     $lookup:
-                    {
-                        from: "technologystacks",
-                        localField: "technologyStack",
-                        foreignField: "_id",
-                        as: "q"
-                    }
+                        {
+                            from: "technologystacks",
+                            localField: "technologyStack",
+                            foreignField: "_id",
+                            as: "q"
+                        }
                 },
                 {
                     $unwind: "$q"
                 },
                 {
                     $match:
-                    {
-                        $or:
-                        [
-                            { "q.technologyName": { $in: regex } },
-                            { "projectName": { $in: regex } },
-                            { "clientName": { $in: regex } },
-                            { "type": { $in: regex } },
-                            { "tags": { $in: regex } }
-                        ]
-                    }
+                        {
+                            $or:
+                                [
+                                    { "q.technologyName": { $in: regex } },
+                                    { "projectName": { $in: regex } },
+                                    { "clientName": { $in: regex } },
+                                    { "type": { $in: regex } },
+                                    { "tags": { $in: regex } }
+                                ]
+                        }
                 },
                 {
                     $group: {
