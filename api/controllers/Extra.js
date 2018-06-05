@@ -38,7 +38,6 @@ router.get('/login', function (req, res) {
     });
 
 }).post('/login', function (req, res) {
-    //console.log(req.body.userName, req.body.password)
     var loginData = {
         userName: "admin6",
         password: "rspl123#"

@@ -60,8 +60,6 @@ let populateArr = [
 ];
 
 module.exports.createProject = (req, res, next) => {
-    // console.log(new Date().toLocaleDateString(), new Date().toLocaleTimeString());
-    // console.log("FILE", req.files);
     if (req.body.technologyStack && !Array.isArray(req.body.technologyStack)) {
         req.body.technologyStack = JSON.parse(req.body.technologyStack);
     }
@@ -120,8 +118,6 @@ module.exports.createProject = (req, res, next) => {
 };
 
 module.exports.createProject_ = (req, res, next) => {
-    // console.log(new Date().toLocaleDateString(), new Date().toLocaleTimeString());
-    // console.log("FILE", req.files);
     if (req.body.technologyStack && !Array.isArray(req.body.technologyStack)) {
         req.body.technologyStack = JSON.parse(req.body.technologyStack);
     }
@@ -242,7 +238,6 @@ module.exports.getProject = (req, res, next) => {
 
 module.exports.editProject = async (req, res, next) => {
     try {
-        // console.log('BODY', req.body, '\n',req.urlCredentials);
         if (req.body.technologyStack && !Array.isArray(req.body.technologyStack)) {
             req.body.technologyStack = JSON.parse(req.body.technologyStack);
         }
@@ -339,7 +334,6 @@ module.exports.searchProject = (req, res, next) => {
             if (searchTextArr[i] != '')
                 regex[i] = new RegExp(searchTextArr[i], "i");
         }
-        // console.log("searchTextArr", searchTextArr, regex);
         Project.aggregate(
             [
                 {
@@ -386,7 +380,6 @@ module.exports.searchProject = (req, res, next) => {
             })
             .then(project => {
                 if (project.length < 1) {
-                    // console.log("Project not found");
                     return res.status(200).json({
                         message: 'No Project found'
                     });
