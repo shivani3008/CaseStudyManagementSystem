@@ -43,6 +43,7 @@ module.exports.userLoginWithAD = (req, res, next) => {
             return res.status(200).json({
                 success: true,
                 message: 'Authentication Successful',
+                userName: req.body.userName,
                 token: token
             });
         }

@@ -179,33 +179,43 @@ module.exports.createProject_ = (req, res, next) => {
         });
 };
 
-module.exports.getAllProjects = (req, res, next) => {
-    Project.find().populate(populateArr).exec()
-        //populate('urlCredentials', 'url userName password type').exec()
-        .then(project => {
-            // console.log(user);
-            if (project.length < 1) {
-                console.log("Project not found");
-                return res.status(200).json({
-                    message: 'You have not created any project'
-                });
+module.exports.getAllProjects = async (req, res, next) => {
+    try {
+        let project = await Project.find().populate(populateArr);
+        if (project.length < 1) {
+            console.log("Project not found");
+            return res.status(200).json({
+                message: 'You have not created any project'
+            });
+        }
+        let myarr = project.map((curr, i, arr) => {
+            return {
+                project: getProject(curr)
             }
-            let myarr = project.map((curr, i, arr) => {
-                return {
-                    project: getProject(curr)
-                }
-            });
-            res.status(200).json({
-                length: project.length,
-                projects: myarr
-            });
-        })
-        .catch(err => {
-            console.log(err);
-            return res.status(500).json({
-                error: err
-            });
         });
+        let projectCounts = await Project.aggregate(
+            [
+                {
+                    $group: {
+                        _id: "$countryName",
+                        projectCount: { $sum: 1 },
+                        "latitude": { $first: "$latitude" },
+                        "longitude": { $first: "$longitude" }
+                    }
+                }
+            ]
+        );
+        res.status(200).json({
+            length: project.length,
+            projects: myarr,
+            projectCounts: projectCounts
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            error: err
+        });
+    }
 };
 
 module.exports.getProject = (req, res, next) => {
@@ -232,7 +242,7 @@ module.exports.getProject = (req, res, next) => {
 
 module.exports.editProject = async (req, res, next) => {
     try {
-        console.log('BODY', req.body, '\n',req.urlCredentials);
+        // console.log('BODY', req.body, '\n',req.urlCredentials);
         if (req.body.technologyStack && !Array.isArray(req.body.technologyStack)) {
             req.body.technologyStack = JSON.parse(req.body.technologyStack);
         }
